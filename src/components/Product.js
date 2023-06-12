@@ -6,7 +6,7 @@ import Rating from './Rating'
 
 import close from '../assets/close.svg'
 
-const Product = ({ item, provider, account, dappazon, togglePop }) => {
+const Product = ({ item, provider, account, dappazon, togglePop, seller, togglePopSeller }) => {
   const [order, setOrder] = useState(null)
   const [hasBought, setHasBought] = useState(false)
 
@@ -86,8 +86,8 @@ const Product = ({ item, provider, account, dappazon, togglePop }) => {
             Buy Now
           </button>
 
-          <p><small>Ships from</small> Dappazon</p>
-          <p><small>Sold by</small> Dappazon</p>
+          <p><small>Ships from</small> {seller.location}</p>
+          <small>Sold by <a href="#" onMouseEnter={togglePopSeller}  onMouseLeave={togglePopSeller}>{seller.name} </a> </small>
 
           {order && (
             <div className='product__bought'>

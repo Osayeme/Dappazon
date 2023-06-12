@@ -168,6 +168,7 @@ nav {
   max-width: 100%;
 }
 
+
 .card__info {
   width: 100%;
 
@@ -315,6 +316,36 @@ nav {
   border: 1px solid var(--clr-grey);
 }
 
+.seller__section {
+  width: 300px;
+  height: 400px;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.7);
+  left: 85%;
+  bottom: 5%;
+  transform: translate(-50%, -50%);
+}
+
+.seller__image{
+  position: absolute;
+  width: 100%;
+  z-index: -1;
+  margin-bottom: 0%;
+}
+
+.seller__image img {
+  max-width: 100%;
+}
+
+.seller__info{
+  width: 100%;
+  background-color: var(--clr-white);
+  padding: 5px 10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin-top: 0;
+}
 @media screen and (max-width: 992px) {
   .product__details {
     height: 95%;

@@ -5,6 +5,7 @@ import { ethers } from 'ethers'
 import Navigation from './components/Navigation'
 import Section from './components/Section'
 import Product from './components/Product'
+import Seller from './components/Seller'
 
 // ABIs
 import Dappazon from './abis/Dappazon.json'
@@ -23,7 +24,14 @@ function App() {
   const [toys, setToys] = useState(null)
 
   const [item, setItem] = useState({})
+  const [seller, setSeller] = useState({})
   const [toggle, setToggle] = useState(false)
+  const [toggleSeller, setToggleSeller] = useState(false)
+
+const togglePopSeller = () => {
+    toggleSeller ? setToggleSeller(false) : setToggleSeller(true)
+    console.log(toggleSeller)
+}
 
   const togglePop = (item) => {
     setItem(item)
@@ -39,12 +47,15 @@ function App() {
     setDappazon(dappazon)
 
     const items = []
+    setSeller(await dappazon.sellers('0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC'))
+    
+    
 
     for (var i = 0; i < 9; i++) {
-      const item = await dappazon.items(i + 1)
+      const item = await dappazon.items(i)
       items.push(item)
     }
-
+    console.log(await dappazon.items(1))
     const electronics = items.filter((item) => item.category === 'electronics')
     const clothing = items.filter((item) => item.category === 'clothing')
     const toys = items.filter((item) => item.category === 'toys')
@@ -73,8 +84,11 @@ function App() {
       )}
 
       {toggle && (
-        <Product item={item} provider={provider} account={account} dappazon={dappazon} togglePop={togglePop} />
+        <Product item={item} provider={provider} account={account} dappazon={dappazon} togglePop={togglePop} seller= {seller} togglePopSeller={togglePopSeller}/>
       )}
+
+      {toggleSeller && (
+        <Seller seller={seller} togglePopSeller={togglePopSeller} /> )}
     </div>
   );
 }

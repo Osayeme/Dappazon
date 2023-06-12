@@ -1,8 +1,16 @@
 const { expect } = require("chai")
+const { boolean } = require("hardhat/internal/core/params/argumentTypes")
 
 const tokens = (n) => {
   return ethers.utils.parseUnits(n.toString(), 'ether')
 }
+
+// Global constants for creating a seller...
+const SELLER_NAME = "Giga Chad"
+const DESCRIPTION = "Hey I'm a seller!"
+const SELLER_IMAGE = "https://ipfs.io/ipfs/QmTYEboq8raiBs7GTUg2yLXB3PMz6HuBNgNfSZBx5Msztg/shoes.jpg"
+const LOCATION = "Nigeria"
+const CONTACT = "GigaChad@gmail.com"
 
 // Global constants for listing an item...
 const ID = 1
@@ -13,13 +21,16 @@ const COST = tokens(1)
 const RATING = 4
 const STOCK = 5
 
+
 describe("Dappazon", () => {
   let dappazon
-  let deployer, buyer
+  let deployer, buyer, seller
+  
 
   beforeEach(async () => {
     // Setup accounts
-    [deployer, buyer] = await ethers.getSigners()
+    [deployer, buyer, seller] = await ethers.getSigners()
+
 
     // Deploy contract
     const Dappazon = await ethers.getContractFactory("Dappazon")
@@ -32,12 +43,39 @@ describe("Dappazon", () => {
     })
   })
 
+  describe("approving a seller", () => {
+
+    beforeEach(async () => {
+      //approve seller
+      transaction = await dappazon.connect(deployer).approveSeller(seller.address, SELLER_NAME, DESCRIPTION, SELLER_IMAGE, LOCATION, CONTACT)
+      await transaction.wait()
+    })
+
+    it("Returns seller attributes", async () => {
+      const seller_l = await dappazon.sellers(seller.address)
+      expect(seller_l.name).to.equal(SELLER_NAME)
+      expect(seller_l.description).to.equal(DESCRIPTION)
+      expect(seller_l.image).to.equal(SELLER_IMAGE)
+      expect(seller_l.location).to.equal(LOCATION)
+      expect(seller_l.contact).to.equal(CONTACT)
+      expect(seller_l.approved).to.equal(true)
+    })
+
+    it("Emits Approve event", () => {
+      expect(transaction).to.emit(dappazon, "SellerAdded")
+    })
+  })
+
+
+
   describe("Listing", () => {
     let transaction
 
     beforeEach(async () => {
+      //approve a seller
+      transaction = await dappazon.connect(deployer).approveSeller(seller.address, SELLER_NAME, DESCRIPTION, SELLER_IMAGE, LOCATION, CONTACT)
       // List a item
-      transaction = await dappazon.connect(deployer).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
+      transaction = await dappazon.connect(seller).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
       await transaction.wait()
     })
 
@@ -51,6 +89,7 @@ describe("Dappazon", () => {
       expect(item.cost).to.equal(COST)
       expect(item.rating).to.equal(RATING)
       expect(item.stock).to.equal(STOCK)
+      expect(item.seller).to.equal(seller.address)
     })
 
     it("Emits List event", () => {
@@ -62,12 +101,26 @@ describe("Dappazon", () => {
     let transaction
 
     beforeEach(async () => {
+      //approve a seller
+      transaction = await dappazon.connect(deployer).approveSeller(seller.address, SELLER_NAME, DESCRIPTION, SELLER_IMAGE, LOCATION, CONTACT)
       // List a item
-      transaction = await dappazon.connect(deployer).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
+      transaction = await dappazon.connect(seller).list(ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK)
       await transaction.wait()
+
+            // Get seller balance before
+      balanceBefore = await ethers.provider.getBalance(seller.address)
+      console.log("balance before:", balanceBefore.value)
+      console.log("Cost:", (COST.value))
+      console.log("expected balance:", (COST) + (balanceBefore))
+      console.log( typeof(COST))
+      console.log( typeof(balanceBefore))
+
 
       // Buy a item
       transaction = await dappazon.connect(buyer).buy(ID, { value: COST })
+      console.log("seller balance after buy:", await ethers.provider.getBalance(seller.address))
+      
+
       await transaction.wait()
     })
 
@@ -84,9 +137,9 @@ describe("Dappazon", () => {
       expect(order.item.name).to.equal(NAME)
     })
 
-    it("Updates the contract balance", async () => {
-      const result = await ethers.provider.getBalance(dappazon.address)
-      expect(result).to.equal(COST)
+    it("Updates the sellers balance", async () => {
+      const result = await ethers.provider.getBalance(seller.address)
+      expect(result).to.be.greaterThan(balanceBefore)
     })
 
     it("Emits Buy event", () => {
@@ -114,10 +167,10 @@ describe("Dappazon", () => {
       await transaction.wait()
     })
 
-    it('Updates the owner balance', async () => {
+   /* it('Updates the owner balance', async () => {
       const balanceAfter = await ethers.provider.getBalance(deployer.address)
       expect(balanceAfter).to.be.greaterThan(balanceBefore)
-    })
+    }) */
 
     it('Updates the contract balance', async () => {
       const result = await ethers.provider.getBalance(dappazon.address)

@@ -12,34 +12,36 @@ const tokens = (n) => {
 }
 
 async function main() {
-  const [deployer] = await ethers.getSigners()
+  // Setup accounts
+  [deployer, buyer, seller] = await ethers.getSigners()
 
+  // Deploy Dappazon
   const Dappazon = await hre.ethers.getContractFactory("Dappazon")
   const dappazon = await Dappazon.deploy()
   await dappazon.deployed()
 
-  console.log(`Dappazon contract deployed at:", ${dappazon.address}\n`)
+  console.log(`Deployed Dappazon Contract at: ${dappazon.address}\n`)
 
+  // Approve seller
+  const transaction = await dappazon.connect(deployer).approveSeller(seller.address, "Giga-Chad", "Seller Description", "https://ipfs.io/ipfs/QmTYEboq8raiBs7GTUg2yLXB3PMz6HuBNgNfSZBx5Msztg/shoes.jpg", "Nigeria", "gigachad@gmail.com")
+  console.log(`Approved seller: ${seller.address}`)
   // Listing items...
   for (let i = 0; i < items.length; i++) {
-    const transaction = await dappazon.connect(deployer).list(
+    const transaction = await dappazon.connect(seller).list(
       items[i].id,
       items[i].name,
       items[i].category,
       items[i].image,
       tokens(items[i].price),
       items[i].rating,
-      items[i].stock,
+      items[i].stock
     )
-
 
     await transaction.wait()
 
     console.log(`Listed item ${items[i].id}: ${items[i].name}`)
-  } 
-
-
-
+    console.log( await dappazon.items(i))
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
