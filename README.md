@@ -1,10 +1,13 @@
 # Dappazon
 Blochain E-commerce Application. Original code base gotten from: https://github.com/dappuniversity/dappazon. 
-Added features: 
+
+## Added features: 
+
 1. Owner can now approve sellers. 
 2. Only approved sellers can list products.
 3. Tokens are transferred to seller's wallet after successful purchase.
 4. Changes to front end.
+   
 ## Technology Stack & Tools
 
 - Solidity (Writing Smart Contracts & Tests)
