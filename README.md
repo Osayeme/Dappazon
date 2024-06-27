@@ -3,6 +3,7 @@ Blochain E-commerce Application. Original code base gotten from: https://github.
 
 ## Added features
 
+- Enabled in-app bridging using Wormhole connect
 - Owner can now approve sellers.
 - Only approved sellers can list products.
 - Tokens are transferred to seller's wallet after successful purchase.
