@@ -6,6 +6,7 @@ import Navigation from './components/Navigation'
 import Section from './components/Section'
 import Product from './components/Product'
 import Seller from './components/Seller'
+import WormholeBridge from '@wormhole-foundation/wormhole-connect';
 
 // ABIs
 import Dappazon from './abis/Dappazon.json'
@@ -25,6 +26,7 @@ function App() {
 
   const [item, setItem] = useState({})
   const [seller, setSeller] = useState({})
+  const [wormholeToggle, setWormholeToggle] = useState(false)
   const [toggle, setToggle] = useState(false)
   const [toggleSeller, setToggleSeller] = useState(false)
 
@@ -38,12 +40,17 @@ const togglePopSeller = () => {
     toggle ? setToggle(false) : setToggle(true)
   }
 
+  const toggleWormhole = () => {
+    wormholeToggle? setWormholeToggle(false) : setWormholeToggle(true)
+  }
+
   const loadBlockchainData = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     setProvider(provider)
     const network = await provider.getNetwork()
 
     const dappazon = new ethers.Contract(config[network.chainId].dappazon.address, Dappazon, provider)
+    
     setDappazon(dappazon)
 
     const items = []
@@ -71,7 +78,11 @@ const togglePopSeller = () => {
 
   return (
     <div>
-      <Navigation account={account} setAccount={setAccount} />
+      <Navigation account={account} setAccount={setAccount} toggleWormhole = {toggleWormhole} />
+      
+      {wormholeToggle && (
+        <WormholeBridge />
+      )}
 
       <h2>Dappazon Best Sellers</h2>
 

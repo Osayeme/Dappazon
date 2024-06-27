@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-const Navigation = ({ account, setAccount }) => {
+const Navigation = ({ account, setAccount, toggleWormhole }) => {
     const connectHandler = async () => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = ethers.utils.getAddress(accounts[0])
@@ -39,9 +39,11 @@ const Navigation = ({ account, setAccount }) => {
                 <li><a href="#Clothing & Jewelry">Clothing & Jewelry</a></li>
                 <li><a href="#Electronics & Gadgets">Electronics & Gadgets</a></li>
                 <li><a href="#Toys & Gaming">Toys & Gaming</a></li>
+                <li><a  style={{cursor:"pointer", justifyContent: "right"}}
+                onClick={toggleWormhole}>Convert tokens to ETH?</a></li>
             </ul>
         </nav>
     );
 }
 
-export default Navigation;
+export default Navigation
